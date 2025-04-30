@@ -1,0 +1,22 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Log in to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ secrets.ECR_IMAGE_URI }} -f serving/docker/Dockerfile .
+        docker tag ${{ secrets.ECR_IMAGE_URI }} ${{ secrets.ECR_IMAGE_URI }}:latest
+        docker push ${{ secrets.ECR_IMAGE_URI }}:latest
